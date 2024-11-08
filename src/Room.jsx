@@ -1,5 +1,9 @@
 // src/Room.jsx
-function Room() {
-    return <h1>Room Page</h1>;
+import Whiteboard from "./components/Whiteboard";
+function Room({socket}) {
+    return (
+        <Whiteboard socket={socket}/>
+    );
+
 }
 export default Room;

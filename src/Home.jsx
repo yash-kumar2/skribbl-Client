@@ -4,7 +4,13 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import * as React from 'react';
+import { useState } from 'react';
 import Modal from '@mui/material/Modal';
+import TextField from '@mui/material/TextField';
+import { io } from 'socket.io-client';
+
+const socket = io(); // Adjust this if the server address is different
+
 const style = {
     position: 'absolute',
     top: '50%',
@@ -15,55 +21,100 @@ const style = {
     border: '2px solid #000',
     boxShadow: 24,
     p: 4,
-  };
-function Home() {
+};
+
+function Home({socket}) {
     const navigate = useNavigate();
-
-    const handleJoinRoom = () => {
-        // Logic to join a room (e.g., prompt for room ID and navigate)
-        navigate('/join'); // Adjust path if needed
+    const handleJoinRoom = (username, room) => {
+        socket.emit('join', { username, room }, (error) => {
+            if (error) {
+                console.error(error); // Replace with a state update if needed
+            } else {
+                console.log("sdf")
+                navigate(`/room/${room}`);
+                console.log(room)
+            }
+        });
     };
-
-    const handleCreateRoom = () => {
-        // Logic to create a room and navigate to it
-        navigate('/create'); // Adjust path if needed
-    };
+    
     const [open, setOpen] = React.useState(false);
-     const handleOpen = () => setOpen(true);
-    const handleClose = () => setOpen(false);
+    const [username, setUsername] = React.useState('');
+    const [room, setRoom] = React.useState('');
+    const [error, setError] = React.useState('');
+    const [option,setOption]=useState("")
+
+    const handleOpen = () => setOpen(true);
+    const handleClose = () => {
+        setOpen(false);
+        setError('');
+        setUsername('');
+        setRoom('');
+    };
+
+    
 
     return (
         <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-purple-500 to-indigo-500">
             <h1 className="text-4xl font-bold text-white mb-10">Welcome to Scribbl Clone</h1>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div
-                    onClick={handleJoinRoom}
+                    onClick={handleOpen}
                     className="cursor-pointer w-64 h-48 bg-blue-400 hover:bg-blue-500 transition-all rounded-lg shadow-lg flex flex-col items-center justify-center text-white text-xl font-semibold"
                 >
                     Join Room
                 </div>
                 <div
-                    onClick={handleOpen}
+                    onClick={() => navigate('/create')}
                     className="cursor-pointer w-64 h-48 bg-green-400 hover:bg-green-500 transition-all rounded-lg shadow-lg flex flex-col items-center justify-center text-white text-xl font-semibold"
                 >
                     Create Room
                 </div>
             </div>
+
             <Modal
                 open={open}
                 onClose={handleClose}
                 aria-labelledby="modal-modal-title"
                 aria-describedby="modal-modal-description"
             >
-                 <Box sx={style}>
-          <Typography id="modal-modal-title" variant="h6" component="h2">
-            Text in a modal
-          </Typography>
-          <Typography id="modal-modal-description" sx={{ mt: 2 }}>
-           work in progress
-          </Typography>
-        </Box>
-      </Modal>
+                <Box sx={style}>
+                    <Typography id="modal-modal-title" variant="h6" component="h2">
+                        Join Room
+                    </Typography>
+                    <TextField
+                        label="Username"
+                        fullWidth
+                        variant="outlined"
+                        margin="normal"
+                        value={username}
+                        onChange={(e) => setUsername(e.target.value)}
+                    />
+                    <TextField
+                        label="Room ID"
+                        fullWidth
+                        variant="outlined"
+                        margin="normal"
+                        value={room}
+                        onChange={(e) => setRoom(e.target.value)}
+                    />
+                    {error && (
+                        <Typography color="error" sx={{ mt: 1 }}>
+                            {error}
+                        </Typography>
+                    )}
+                    <Button
+                        variant="contained"
+                        color="primary"
+                        fullWidth
+                        onClick={()=>{
+                            handleJoinRoom(username,room)
+                        }}
+                        sx={{ mt: 2 }}
+                    >
+                        Join Room
+                    </Button>
+                </Box>
+            </Modal>
         </div>
     );
 }
