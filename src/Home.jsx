@@ -23,11 +23,12 @@ const style = {
     p: 4,
 };
 
-function Home({socket}) {
+function Home({socket,option,setOption}) {
     const navigate = useNavigate();
-    const handleJoinRoom = (username, room) => {
-        socket.emit('join', { username, room }, (error) => {
+    const handleJoinRoom = (username, room,option) => {
+        socket.emit('join', { username, room,option }, (error) => {
             if (error) {
+                setError(error)
                 console.error(error); // Replace with a state update if needed
             } else {
                 console.log("sdf")
@@ -41,9 +42,12 @@ function Home({socket}) {
     const [username, setUsername] = React.useState('');
     const [room, setRoom] = React.useState('');
     const [error, setError] = React.useState('');
-    const [option,setOption]=useState("")
+    
 
-    const handleOpen = () => setOpen(true);
+    const handleOpen = (option2) => {
+        setOption(option2)
+        
+        setOpen(true)};
     const handleClose = () => {
         setOpen(false);
         setError('');
@@ -58,13 +62,13 @@ function Home({socket}) {
             <h1 className="text-4xl font-bold text-white mb-10">Welcome to Scribbl Clone</h1>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                 <div
-                    onClick={handleOpen}
+                    onClick={()=>handleOpen('join')}
                     className="cursor-pointer w-64 h-48 bg-blue-400 hover:bg-blue-500 transition-all rounded-lg shadow-lg flex flex-col items-center justify-center text-white text-xl font-semibold"
                 >
                     Join Room
                 </div>
                 <div
-                    onClick={() => navigate('/create')}
+                    onClick={()=>handleOpen('create')}
                     className="cursor-pointer w-64 h-48 bg-green-400 hover:bg-green-500 transition-all rounded-lg shadow-lg flex flex-col items-center justify-center text-white text-xl font-semibold"
                 >
                     Create Room
@@ -79,7 +83,7 @@ function Home({socket}) {
             >
                 <Box sx={style}>
                     <Typography id="modal-modal-title" variant="h6" component="h2">
-                        Join Room
+                        {option} Room
                     </Typography>
                     <TextField
                         label="Username"
@@ -107,11 +111,11 @@ function Home({socket}) {
                         color="primary"
                         fullWidth
                         onClick={()=>{
-                            handleJoinRoom(username,room)
+                            handleJoinRoom(username,room,option)
                         }}
                         sx={{ mt: 2 }}
                     >
-                        Join Room
+                        {option} Room
                     </Button>
                 </Box>
             </Modal>
