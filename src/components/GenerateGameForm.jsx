@@ -16,7 +16,7 @@ const style = {
     p: 4,
 };
 
-const CreateGameModal = ({ socket }) => {
+const CreateGameModal = ({ socket,setGameStarted }) => {
     const [open, setOpen] = useState(false);
     const [formData, setFormData] = useState({
         noOfPlayers: 2,
@@ -36,7 +36,8 @@ const CreateGameModal = ({ socket }) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        socket.emit('createroom', formData);
+        socket.emit('gameStarted', formData);
+        setGameStarted(true)
         handleClose();
     };
 
