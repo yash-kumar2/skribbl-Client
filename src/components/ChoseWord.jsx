@@ -16,6 +16,7 @@ function WordSelection({ words, ms, onWordChosen }) {
                 return prev - 1;
             });
         }, 1000);
+        //onWordChosen(words[0])
 
         return () => clearInterval(timer);
     }, [ms]);
