@@ -1,35 +1,16 @@
-// src/GameStarting.jsx
 import React from 'react';
-import { Box, Typography, CircularProgress } from '@mui/material';
 
-function Waiting({content}) {
-    
+function Waiting({ content }) {
     return (
-        
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-purple-500 to-indigo-500">
-            <Box
-                display="flex"
-                flexDirection="column"
-                alignItems="center"
-                justifyContent="center"
-                textAlign="center"
-                sx={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    p: 4,
-                    bgcolor: 'background.paper',
-                    borderRadius: '12px',
-                    boxShadow: 3,
-                    width: '300px',
-                }}
-            >
-                <Typography variant="h5" sx={{ mb: 3, color: 'text.primary' }}>
+        <div className="min-h-screen bg-gradient-to-br from-blue-400 via-purple-400 to-pink-400 flex items-center justify-center p-4">
+            <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-sm text-center">
+                <h2 className="text-2xl font-bold text-gray-800 mb-6">
                     {content}
-                </Typography>
-                <CircularProgress size={60} sx={{ color: 'primary.main' }} />
-            </Box>
+                </h2>
+                <div className="flex justify-center">
+                    <div className="w-16 h-16 border-4 border-purple-500 border-t-transparent rounded-full animate-spin"></div>
+                </div>
+            </div>
         </div>
     );
 }

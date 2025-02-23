@@ -1,22 +1,6 @@
 import React, { useState } from 'react';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import Modal from '@mui/material/Modal';
-import Typography from '@mui/material/Typography';
 
-const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 400,
-    bgcolor: '#f0f8ff',
-    borderRadius: '10px',
-    boxShadow: 24,
-    p: 4,
-};
-
-const CreateGameModal = ({ socket,setGameStarted }) => {
+const CreateGameModal = ({ socket, setGameStarted }) => {
     const [open, setOpen] = useState(false);
     const [formData, setFormData] = useState({
         noOfPlayers: 2,
@@ -37,7 +21,7 @@ const CreateGameModal = ({ socket,setGameStarted }) => {
     const handleSubmit = (e) => {
         e.preventDefault();
         socket.emit('gameStarted', formData);
-        setGameStarted(true)
+        setGameStarted(true);
         handleClose();
     };
 
@@ -45,92 +29,111 @@ const CreateGameModal = ({ socket,setGameStarted }) => {
     const handleClose = () => setOpen(false);
 
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-purple-500 to-indigo-500">
-            <h1 className="text-4xl font-bold text-white mb-10">Create a Game</h1>
-            <Button onClick={handleOpen} variant="contained" color="primary">
-                Open Form
-            </Button>
+        <div className="min-h-screen bg-gradient-to-br from-blue-400 via-purple-400 to-pink-400 flex items-center justify-center p-4">
+            <div className="text-center">
+                <h1 className="text-6xl font-bold text-white mb-6 drop-shadow-lg">
+                    Scribbl
+                </h1>
+                <button
+                    onClick={handleOpen}
+                    className="bg-yellow-400 hover:bg-yellow-500 text-gray-800 font-bold py-4 px-8 rounded-full transform hover:scale-105 transition-transform duration-200 shadow-lg text-xl"
+                >
+                    Create Game Room
+                </button>
 
-            <Modal open={open} onClose={handleClose}>
-                <Box sx={style}>
-                    <Typography variant="h6" component="h2" style={{ color: '#4b0082', textAlign: 'center' }}>
-                        Create a Game
-                    </Typography>
-                    <form onSubmit={handleSubmit} style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                        <label style={{ color: '#4682b4' }}>
-                            Number of Players (2-20):
-                            <input
-                                type="number"
-                                name="noOfPlayers"
-                                min="2"
-                                max="20"
-                                value={formData.noOfPlayers}
-                                onChange={handleChange}
-                                style={{ marginLeft: '10px', padding: '5px', borderRadius: '5px' }}
-                            />
-                        </label>
-                        <label style={{ color: '#4682b4' }}>
-                            Number of Rounds (2-10):
-                            <input
-                                type="number"
-                                name="noOfRounds"
-                                min="2"
-                                max="10"
-                                value={formData.noOfRounds}
-                                onChange={handleChange}
-                                style={{ marginLeft: '10px', padding: '5px', borderRadius: '5px' }}
-                            />
-                        </label>
-                        <label style={{ color: '#4682b4' }}>
-                            Draw Time (10-150 sec):
-                            <input
-                                type="number"
-                                name="drawTime"
-                                min="10"
-                                max="150"
-                                value={formData.drawTime}
-                                onChange={handleChange}
-                                style={{ marginLeft: '10px', padding: '5px', borderRadius: '5px' }}
-                            />
-                        </label>
-                        <label style={{ color: '#4682b4' }}>
-                            Hints:
-                            <input
-                                type="checkbox"
-                                name="hints"
-                                checked={formData.hints}
-                                onChange={handleChange}
-                                style={{ marginLeft: '10px', transform: 'scale(1.2)' }}
-                            />
-                        </label>
-                        <label style={{ color: '#4682b4' }}>
-                            Word Count (1-4):
-                            <input
-                                type="number"
-                                name="wordCount"
-                                min="1"
-                                max="4"
-                                value={formData.wordCount}
-                                onChange={handleChange}
-                                style={{ marginLeft: '10px', padding: '5px', borderRadius: '5px' }}
-                            />
-                        </label>
-                        <button
-                            type="submit"
-                            style={{
-                                backgroundColor: '#4b0082',
-                                color: 'white',
-                                padding: '10px',
-                                borderRadius: '5px',
-                                cursor: 'pointer',
-                                fontWeight: 'bold',
-                            }}
-                        >
-                            Create Room
-                        </button>
-                    </form>
-                </Box>
-            </Modal>
+                {open && (
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                        <div className="bg-white rounded-xl shadow-2xl w-full max-w-md">
+                            <div className="p-6">
+                                <h2 className="text-3xl font-bold text-center text-purple-600 mb-6">
+                                    Game Settings
+                                </h2>
+                                <form onSubmit={handleSubmit} className="space-y-6">
+                                    <div className="space-y-4">
+                                        {[
+                                            {
+                                                label: "Players",
+                                                name: "noOfPlayers",
+                                                min: 2,
+                                                max: 20,
+                                                icon: "👥"
+                                            },
+                                            {
+                                                label: "Rounds",
+                                                name: "noOfRounds",
+                                                min: 2,
+                                                max: 10,
+                                                icon: "🔄"
+                                            },
+                                            {
+                                                label: "Draw Time",
+                                                name: "drawTime",
+                                                min: 10,
+                                                max: 150,
+                                                icon: "⏱"
+                                            },
+                                            {
+                                                label: "Words",
+                                                name: "wordCount",
+                                                min: 1,
+                                                max: 4,
+                                                icon: "📝"
+                                            }
+                                        ].map((setting) => (
+                                            <div key={setting.name} className="relative">
+                                                <label className="block text-lg font-medium text-gray-700 mb-2">
+                                                    {setting.icon} {setting.label}
+                                                </label>
+                                                <input
+                                                    type="range"
+                                                    name={setting.name}
+                                                    min={setting.min}
+                                                    max={setting.max}
+                                                    value={formData[setting.name]}
+                                                    onChange={handleChange}
+                                                    className="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer"
+                                                />
+                                                <span className="absolute right-0 -top-1 text-sm font-medium text-purple-600">
+                                                    {formData[setting.name]}
+                                                </span>
+                                            </div>
+                                        ))}
+                                        
+                                        <div className="flex items-center space-x-3">
+                                            <label className="text-lg font-medium text-gray-700">
+                                                💡 Enable Hints
+                                            </label>
+                                            <input
+                                                type="checkbox"
+                                                name="hints"
+                                                checked={formData.hints}
+                                                onChange={handleChange}
+                                                className="w-6 h-6 rounded border-gray-300"
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <div className="flex space-x-4">
+                                        <button
+                                            type="button"
+                                            onClick={handleClose}
+                                            className="w-1/2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-bold py-3 px-4 rounded-lg transition-colors duration-200"
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button
+                                            type="submit"
+                                            className="w-1/2 bg-purple-600 hover:bg-purple-700 text-white font-bold py-3 px-4 rounded-lg transition-colors duration-200"
+                                        >
+                                            Start Game
+                                        </button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </div>
         </div>
     );
 };

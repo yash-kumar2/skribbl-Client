@@ -1,53 +1,28 @@
-// src/Home.jsx
+import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import Box from '@mui/material/Box';
-import Button from '@mui/material/Button';
-import Typography from '@mui/material/Typography';
-import * as React from 'react';
-import { useState } from 'react';
-import Modal from '@mui/material/Modal';
-import TextField from '@mui/material/TextField';
-import { io } from 'socket.io-client';
 
-const socket = io(); // Adjust this if the server address is different
-
-const style = {
-    position: 'absolute',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: 400,
-    bgcolor: 'background.paper',
-    border: '2px solid #000',
-    boxShadow: 24,
-    p: 4,
-};
-
-function Home({socket,option,setOption}) {
+function Home({ socket, option, setOption }) {
     const navigate = useNavigate();
-    const handleJoinRoom = (username, room,option) => {
-        socket.emit('join', { username, room,option }, (error) => {
+    const [open, setOpen] = useState(false);
+    const [username, setUsername] = useState('');
+    const [room, setRoom] = useState('');
+    const [error, setError] = useState('');
+
+    const handleJoinRoom = (username, room, option) => {
+        socket.emit('join', { username, room, option }, (error) => {
             if (error) {
-                setError(error)
-                console.error(error); // Replace with a state update if needed
+                setError(error);
             } else {
-                console.log("sdf")
                 navigate(`/room/${room}`);
-                console.log(room)
             }
         });
     };
-    
-    const [open, setOpen] = React.useState(false);
-    const [username, setUsername] = React.useState('');
-    const [room, setRoom] = React.useState('');
-    const [error, setError] = React.useState('');
-    
 
     const handleOpen = (option2) => {
-        setOption(option2)
-        
-        setOpen(true)};
+        setOption(option2);
+        setOpen(true);
+    };
+
     const handleClose = () => {
         setOpen(false);
         setError('');
@@ -55,70 +30,99 @@ function Home({socket,option,setOption}) {
         setRoom('');
     };
 
-    
-
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-purple-500 to-indigo-500">
-            <h1 className="text-4xl font-bold text-white mb-10">Welcome to Scribbl Clone</h1>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div
-                    onClick={()=>handleOpen('join')}
-                    className="cursor-pointer w-64 h-48 bg-blue-400 hover:bg-blue-500 transition-all rounded-lg shadow-lg flex flex-col items-center justify-center text-white text-xl font-semibold"
-                >
-                    Join Room
+        <div className="min-h-screen bg-gradient-to-br from-blue-400 via-purple-400 to-pink-400 flex items-center justify-center p-4">
+            <div className="max-w-4xl w-full text-center">
+                <div className="mb-12">
+                    <h1 className="text-6xl font-bold text-white mb-4 drop-shadow-lg">
+                        Scribbl
+                    </h1>
+                    <p className="text-white text-xl opacity-90">Draw, Guess, Have Fun!</p>
                 </div>
-                <div
-                    onClick={()=>handleOpen('create')}
-                    className="cursor-pointer w-64 h-48 bg-green-400 hover:bg-green-500 transition-all rounded-lg shadow-lg flex flex-col items-center justify-center text-white text-xl font-semibold"
-                >
-                    Create Room
-                </div>
-            </div>
 
-            <Modal
-                open={open}
-                onClose={handleClose}
-                aria-labelledby="modal-modal-title"
-                aria-describedby="modal-modal-description"
-            >
-                <Box sx={style}>
-                    <Typography id="modal-modal-title" variant="h6" component="h2">
-                        {option} Room
-                    </Typography>
-                    <TextField
-                        label="Username"
-                        fullWidth
-                        variant="outlined"
-                        margin="normal"
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                    />
-                    <TextField
-                        label="Room ID"
-                        fullWidth
-                        variant="outlined"
-                        margin="normal"
-                        value={room}
-                        onChange={(e) => setRoom(e.target.value)}
-                    />
-                    {error && (
-                        <Typography color="error" sx={{ mt: 1 }}>
-                            {error}
-                        </Typography>
-                    )}
-                    <Button
-                        variant="contained"
-                        color="primary"
-                        fullWidth
-                        onClick={()=>{
-                            handleJoinRoom(username,room,option)
-                        }}
-                        sx={{ mt: 2 }}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
+                    <button
+                        onClick={() => handleOpen('join')}
+                        className="group p-8 bg-white bg-opacity-20 backdrop-blur-lg rounded-2xl hover:bg-opacity-30 transition-all duration-300 border-2 border-white border-opacity-20"
                     >
-                        {option} Room
-                    </Button>
-                </Box>
-            </Modal>
+                        <div className="text-6xl mb-4 group-hover:scale-110 transition-transform duration-300">
+                            🎮
+                        </div>
+                        <h2 className="text-2xl font-bold text-white mb-2">Join Room</h2>
+                        <p className="text-white text-opacity-80">Join an existing game room</p>
+                    </button>
+
+                    <button
+                        onClick={() => handleOpen('create')}
+                        className="group p-8 bg-white bg-opacity-20 backdrop-blur-lg rounded-2xl hover:bg-opacity-30 transition-all duration-300 border-2 border-white border-opacity-20"
+                    >
+                        <div className="text-6xl mb-4 group-hover:scale-110 transition-transform duration-300">
+                            🎨
+                        </div>
+                        <h2 className="text-2xl font-bold text-white mb-2">Create Room</h2>
+                        <p className="text-white text-opacity-80">Start a new game room</p>
+                    </button>
+                </div>
+
+                {open && (
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+                        <div className="bg-white rounded-xl shadow-2xl w-full max-w-md">
+                            <div className="p-6">
+                                <h2 className="text-2xl font-bold text-purple-600 mb-6">
+                                    {option === 'join' ? 'Join Game Room' : 'Create Game Room'}
+                                </h2>
+
+                                <div className="space-y-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            Username
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={username}
+                                            onChange={(e) => setUsername(e.target.value)}
+                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent"
+                                            placeholder="Enter your username"
+                                        />
+                                    </div>
+
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-1">
+                                            Room ID
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={room}
+                                            onChange={(e) => setRoom(e.target.value)}
+                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent"
+                                            placeholder="Enter room ID"
+                                        />
+                                    </div>
+
+                                    {error && (
+                                        <p className="text-red-500 text-sm mt-2">{error}</p>
+                                    )}
+
+                                    <div className="flex space-x-4 mt-6">
+                                        <button
+                                            onClick={handleClose}
+                                            className="w-1/2 px-4 py-2 bg-gray-200 hover:bg-gray-300 rounded-lg transition-colors duration-200"
+                                        >
+                                            Cancel
+                                        </button>
+                                        <button
+                                            onClick={() => handleJoinRoom(username, room, option)}
+                                            className="w-1/2 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white rounded-lg transition-colors duration-200"
+                                        >
+                                            {option === 'join' ? 'Join Room' : 'Create Room'}
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+            </div>
         </div>
     );
 }

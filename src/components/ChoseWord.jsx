@@ -1,12 +1,9 @@
-// src/WordSelection.jsx
 import React, { useState, useEffect } from 'react';
-import { Box, Typography, CircularProgress, Button } from '@mui/material';
 
 function WordSelection({ words, ms, onWordChosen }) {
     const [timeLeft, setTimeLeft] = useState(ms / 1000);
 
     useEffect(() => {
-        // Countdown timer
         const timer = setInterval(() => {
             setTimeLeft((prev) => {
                 if (prev <= 1) {
@@ -16,7 +13,6 @@ function WordSelection({ words, ms, onWordChosen }) {
                 return prev - 1;
             });
         }, 1000);
-        //onWordChosen(words[0])
 
         return () => clearInterval(timer);
     }, [ms]);
@@ -25,57 +21,65 @@ function WordSelection({ words, ms, onWordChosen }) {
         onWordChosen(word);
     };
 
+    // Calculate progress circle parameters
+    const radius = 30;
+    const circumference = radius * 2 * Math.PI;
+    const progress = (timeLeft / (ms / 1000)) * 100;
+    const offset = circumference - (progress / 100) * circumference;
+
     return (
-        <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-r from-purple-500 to-indigo-500">
-            <Box
-                display="flex"
-                flexDirection="column"
-                alignItems="center"
-                justifyContent="center"
-                textAlign="center"
-                sx={{
-                    position: 'absolute',
-                    top: '50%',
-                    left: '50%',
-                    transform: 'translate(-50%, -50%)',
-                    p: 4,
-                    bgcolor: 'background.paper',
-                    borderRadius: '12px',
-                    boxShadow: 3,
-                    width: '350px',
-                }}
-            >
-                <Typography variant="h5" sx={{ mb: 3, color: 'text.primary' }}>
+        <div className="min-h-screen bg-gradient-to-br from-blue-400 via-purple-400 to-pink-400 flex items-center justify-center p-4">
+            <div className="bg-white rounded-xl shadow-lg p-8 w-full max-w-md text-center">
+                <h2 className="text-2xl font-bold text-gray-800 mb-6">
                     Choose the word to draw
-                </Typography>
-                
-                {/* Display words as selectable buttons */}
-                <Box display="flex" flexDirection="column" gap={1} sx={{ mb: 3 }}>
+                </h2>
+
+                <div className="flex flex-col gap-3 mb-8">
                     {words.map((word, index) => (
-                        <Button
+                        <button
                             key={index}
-                            variant="outlined"
                             onClick={() => handleWordClick(word)}
-                            sx={{ color: 'primary.main', borderColor: 'primary.main' }}
+                            className="py-3 px-6 border-2 border-purple-500 text-purple-600 rounded-lg 
+                                     hover:bg-purple-500 hover:text-white transition-colors duration-200
+                                     font-medium text-lg"
                         >
                             {word}
-                        </Button>
+                        </button>
                     ))}
-                </Box>
-                
-                {/* Countdown timer */}
-                <Box display="flex" alignItems="center" gap={2}>
-                    <CircularProgress
-                        size={60}
-                        variant="determinate"
-                        value={(timeLeft / (ms / 1000)) * 100}
-                        sx={{ color: 'primary.main' }}
-                    />
-                    <Typography variant="h6" sx={{ color: 'text.primary' }}>
-                        {timeLeft}s
-                    </Typography>
-                </Box>
-            </Box>
+                </div>
+
+                <div className="flex items-center justify-center gap-4">
+                    <div className="relative w-16 h-16">
+                        <svg className="transform -rotate-90 w-16 h-16">
+                            {/* Background circle */}
+                            <circle
+                                cx="32"
+                                cy="32"
+                                r={radius}
+                                stroke="currentColor"
+                                strokeWidth="4"
+                                fill="none"
+                                className="text-gray-200"
+                            />
+                            {/* Progress circle */}
+                            <circle
+                                cx="32"
+                                cy="32"
+                                r={radius}
+                                stroke="currentColor"
+                                strokeWidth="4"
+                                fill="none"
+                                strokeDasharray={circumference}
+                                strokeDashoffset={offset}
+                                className="text-purple-500 transition-all duration-200"
+                            />
+                        </svg>
+                        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                            <span className="text-xl font-bold text-gray-700">{timeLeft}s</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
     );
 }
