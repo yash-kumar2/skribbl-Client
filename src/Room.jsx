@@ -12,7 +12,7 @@ function Room({socket ,option}) {
     const [render,setRender]=useState(<Whiteboard socket={socket} option={option} />)
     const onWordChosen = (word) => {
         socket.emit('wordChosen', word);
-        setRender(<Whiteboard socket={socket} option={option} mode="drawer" word={word} leaderboard={[]}/>);
+        //setRender(<Whiteboard socket={socket} option={option} mode="drawer" word={word} leaderboard={[]}/>);
     };
     const handleChoosing = (name) => {
         console.log("choseee")
@@ -30,13 +30,13 @@ function Room({socket ,option}) {
             console.log("Word selection phase", words);
         };
 
-        const handleStartDraw = () => {
-            setRender(<Whiteboard socket={socket} option={option} mode="drawer" word="hola" leaderboard={[]}/>);
+        const handleStartDraw = ({totalScores}) => {
+            setRender(<Whiteboard socket={socket} option={option} mode="drawer" word={word} leaderboard={totalScores}/>);
         };
 
-        const handleGameStarted = () => {
+        const handleGameStarted = ({totalScores}) => {
             setGameStarted(true);
-            setRender(<Whiteboard socket={socket} option={option} mode="guesser" word="hola" leaderboard={[]}/>);
+            setRender(<Whiteboard socket={socket} option={option} mode="guesser" word={word} leaderboard={totalScores}/>);
         };
         
 

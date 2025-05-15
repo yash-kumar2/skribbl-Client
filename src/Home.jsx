@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useGlobalContext } from './GlobalContext';
 
 function Home({ socket, option, setOption }) {
     const navigate = useNavigate();
@@ -7,6 +8,7 @@ function Home({ socket, option, setOption }) {
     const [username, setUsername] = useState('');
     const [room, setRoom] = useState('');
     const [error, setError] = useState('');
+    const { user, setUser } = useGlobalContext();
 
     const handleJoinRoom = (username, room, option) => {
         socket.emit('join', { username, room, option }, (error) => {
@@ -80,7 +82,9 @@ function Home({ socket, option, setOption }) {
                                         <input
                                             type="text"
                                             value={username}
-                                            onChange={(e) => setUsername(e.target.value)}
+                                            onChange={(e) => {setUsername(e.target.value)
+                                                setUser(e.target.value)
+                                            }}
                                             className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-purple-600 focus:border-transparent"
                                             placeholder="Enter your username"
                                         />
