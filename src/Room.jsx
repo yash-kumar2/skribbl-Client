@@ -4,6 +4,7 @@ import Whiteboard from "./components/Whiteboard";
 import CreateGameForm from "./components/GenerateGameForm";
 import Waiting from "./components/Waiting";
 import WordSelection from "./components/ChoseWord";
+import RoundEnded from "./components/RoundEnded";
 function Room({socket ,option}) {
 
     
@@ -18,12 +19,17 @@ function Room({socket ,option}) {
         console.log("choseee")
         setRender(<Waiting content={`${name} is choosing the word`} />);
     };
-    const handleDrawing = (name)=>{
+    const handleDrawing = ({totalScores})=>{
          console.log("cjc")
     
-         setRender(<Whiteboard socket={socket} option={option} mode="guesser" word="*****" leaderboard={[]} />)
+         setRender(<Whiteboard socket={socket} option={option} mode="guesser" word="*****" leaderboard={totalScores} />)
 
     }
+    const handleRoundEnded = (data) => {
+        console.log("Round ended:", data);
+        setRender(<RoundEnded data={data} />);
+    };
+    
     useEffect(() => {
         const handleChooseWord = (words) => {
             setRender(<WordSelection words={words} ms={25000} onWordChosen={onWordChosen} />);
@@ -31,11 +37,12 @@ function Room({socket ,option}) {
         };
 
         const handleStartDraw = ({totalScores}) => {
-            setRender(<Whiteboard socket={socket} option={option} mode="drawer" word={word} leaderboard={totalScores}/>);
+            setRender(<Whiteboard socket={socket} option={option} mode="drawer" word="dsasd" leaderboard={totalScores}/>);
         };
 
         const handleGameStarted = ({totalScores}) => {
             setGameStarted(true);
+            console.log(totalScores)
             setRender(<Whiteboard socket={socket} option={option} mode="guesser" word={word} leaderboard={totalScores}/>);
         };
         
@@ -46,6 +53,7 @@ function Room({socket ,option}) {
         socket.on('gameStarted', handleGameStarted);
         socket.on('choosing',handleChoosing);
         socket.on('drawing',handleDrawing);
+        socket.on('roundEnded', handleRoundEnded);
 
         // Cleanup listeners on component unmount
         return () => {
@@ -54,6 +62,7 @@ function Room({socket ,option}) {
             socket.off('gameStarted', handleGameStarted);
             socket.off('choosing', handleChoosing);
             socket.off('drawing', handleDrawing);
+            socket.off('roundEnded', handleRoundEnded);
         };
     }, [socket, option]);
    
