@@ -5,6 +5,7 @@ import CreateGameForm from "./components/GenerateGameForm";
 import Waiting from "./components/Waiting";
 import WordSelection from "./components/ChoseWord";
 import RoundEnded from "./components/RoundEnded";
+import FinalResults from "./components/FinalResults"
 function Room({socket ,option}) {
 
     
@@ -29,6 +30,11 @@ function Room({socket ,option}) {
         console.log("Round ended:", data);
         setRender(<RoundEnded data={data} />);
     };
+    const handleGameEnded = (data) => {
+        console.log("Game ended:", data);
+        setRender(<FinalResults data={data} />);
+    };
+    
     
     useEffect(() => {
         const handleChooseWord = (words) => {
@@ -54,6 +60,7 @@ function Room({socket ,option}) {
         socket.on('choosing',handleChoosing);
         socket.on('drawing',handleDrawing);
         socket.on('roundEnded', handleRoundEnded);
+        socket.on('gameEnded', handleGameEnded);
 
         // Cleanup listeners on component unmount
         return () => {
@@ -63,6 +70,7 @@ function Room({socket ,option}) {
             socket.off('choosing', handleChoosing);
             socket.off('drawing', handleDrawing);
             socket.off('roundEnded', handleRoundEnded);
+            socket.on('roundEnded', handleGameEnded);
         };
     }, [socket, option]);
    
