@@ -20,10 +20,12 @@ function Room({socket ,option}) {
         console.log("choseee")
         setRender(<Waiting content={`${name} is choosing the word`} />);
     };
-    const handleDrawing = ({totalScores})=>{
+    const handleDrawing = ({totalScores,wordLength,time})=>{
          console.log("cjc")
+         console.log(wordLength)
+         let stars = '-'.repeat(wordLength);
     
-         setRender(<Whiteboard socket={socket} option={option} mode="guesser" word="*****" leaderboard={totalScores} />)
+         setRender(<Whiteboard socket={socket} time={time} option={option} mode="guesser" word={stars} leaderboard={totalScores} />)
 
     }
     const handleRoundEnded = (data) => {
@@ -42,8 +44,8 @@ function Room({socket ,option}) {
             console.log("Word selection phase", words);
         };
 
-        const handleStartDraw = ({totalScores}) => {
-            setRender(<Whiteboard socket={socket} option={option} mode="drawer" word="dsasd" leaderboard={totalScores}/>);
+        const handleStartDraw = ({word,totalScores,time}) => {
+            setRender(<Whiteboard socket={socket} time={time} option={option} mode="drawer" word={word} leaderboard={totalScores}/>);
         };
 
         const handleGameStarted = ({totalScores}) => {

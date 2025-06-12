@@ -1,10 +1,10 @@
 import React, { useRef, useState, useEffect } from 'react';
 
-const Whiteboard = ({ socket, mode, word, leaderboard: initialLeaderboard }) => {
+const Whiteboard = ({ socket, mode, word, leaderboard: initialLeaderboard, time }) => {
   const canvasRef = useRef(null);
   const contextRef = useRef(null);
   const [isDrawing, setIsDrawing] = useState(false);
-  let strokeColor = '#000000';
+  const [strokeColor, setStrokeColor] = useState('#000000'); // Changed to state
   const [lineWidth, setLineWidth] = useState(5);
   const [fillColor, setFillColor] = useState('#ffffff');
   const [messages, setMessages] = useState([]);
@@ -14,7 +14,9 @@ const Whiteboard = ({ socket, mode, word, leaderboard: initialLeaderboard }) => 
     { username: "Bob", score: 980 },
     { username: "Charlie", score: 400 }
   ]);
+  const [timeLeft, setTimeLeft] = useState(time || 0); // Timer state
   const messagesEndRef = useRef(null);
+  const timerRef = useRef(null);
 
   // Scroll to bottom of messages
   const scrollToBottom = () => {
@@ -30,6 +32,42 @@ const Whiteboard = ({ socket, mode, word, leaderboard: initialLeaderboard }) => 
       setLeaderboard(initialLeaderboard);
     }
   }, [initialLeaderboard]);
+
+  // Timer effect
+  useEffect(() => {
+    if (time !== undefined && time !== null) {
+      setTimeLeft(time);
+    }
+  }, [time]);
+
+  useEffect(() => {
+    if (timeLeft > 0) {
+      timerRef.current = setInterval(() => {
+        setTimeLeft(prev => {
+          if (prev <= 1) {
+            clearInterval(timerRef.current);
+            return 0;
+          }
+          return prev - 1;
+        });
+      }, 1000);
+    } else {
+      clearInterval(timerRef.current);
+    }
+
+    return () => {
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
+    };
+  }, [timeLeft]);
+
+  // Format time for display
+  const formatTime = (seconds) => {
+    const mins = Math.floor(seconds / 60);
+    const secs = seconds % 60;
+    return `${mins}:${secs.toString().padStart(2, '0')}`;
+  };
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -88,7 +126,7 @@ const Whiteboard = ({ socket, mode, word, leaderboard: initialLeaderboard }) => 
     
     const handleColorChange2 = (color) => {
       console.log(color);
-      strokeColor = color;
+      setStrokeColor(color); // Fixed: Update state instead of variable
       contextRef.current.strokeStyle = color;
     };
 
@@ -157,9 +195,10 @@ const Whiteboard = ({ socket, mode, word, leaderboard: initialLeaderboard }) => 
   };
 
   const handleColorChange = (e) => {
-    strokeColor = e.target.value;
-    contextRef.current.strokeStyle = e.target.value;
-    socket.emit('colorChange', e.target.value);
+    const newColor = e.target.value;
+    setStrokeColor(newColor); // Update state
+    contextRef.current.strokeStyle = newColor;
+    socket.emit('colorChange', newColor);
   };
 
   const handleLineWidthChange = (e) => {
@@ -191,11 +230,28 @@ const Whiteboard = ({ socket, mode, word, leaderboard: initialLeaderboard }) => 
           <div className="lg:col-span-2 bg-white bg-opacity-90 backdrop-blur-lg rounded-2xl shadow-xl p-6 border-2 border-white border-opacity-20">
             <div className="flex items-center justify-between mb-4">
               <h2 className="text-2xl font-bold text-purple-700 capitalize">{mode} Mode</h2>
-              {mode === 'drawer' && word && (
-                <div className="text-lg bg-purple-100 px-4 py-2 rounded-full">
-                  Draw: <span className="font-bold text-purple-800">{word}</span>
-                </div>
-              )}
+              <div className="flex items-center gap-4">
+                {/* Timer Display */}
+                {time !== undefined && time !== null && (
+                  <div className={`text-xl font-bold px-4 py-2 rounded-full ${
+                    timeLeft <= 10 ? 'bg-red-100 text-red-800 animate-pulse' : 
+                    timeLeft <= 30 ? 'bg-yellow-100 text-yellow-800' : 
+                    'bg-green-100 text-green-800'
+                  }`}>
+                    ⏰ {formatTime(timeLeft)}
+                  </div>
+                )}
+                {mode === 'drawer' && word && (
+                  <div className="text-lg bg-purple-100 px-4 py-2 rounded-full">
+                    Draw: <span className="font-bold text-purple-800">{word}</span>
+                  </div>
+                )}
+                {mode !== 'drawer' && word && (
+                  <div className="text-lg bg-purple-100 px-4 py-2 rounded-full">
+                    Guess: <span className="font-bold text-purple-800">{word}</span>
+                  </div>
+                )}
+              </div>
             </div>
 
             {mode === 'drawer' && (
@@ -204,6 +260,7 @@ const Whiteboard = ({ socket, mode, word, leaderboard: initialLeaderboard }) => 
                   <label className="text-sm font-medium text-gray-700">Color:</label>
                   <input
                     type="color"
+                    value={strokeColor}
                     onChange={handleColorChange}
                     className="w-16 h-8 rounded cursor-pointer"
                   />
