@@ -18,7 +18,7 @@ function Home({ socket, option, setOption }) {
         setCheckError('');
         
         try {
-            const response = await fetch('http://localhost:3000/active');
+            const response = await fetch('https://server-skribbl.onrender.com/active');
             if (response.ok) {
                 setIsActive(true);
             } else {
